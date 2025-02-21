@@ -1,0 +1,32 @@
+.todo-input {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .todo-input h2 {
+    margin-bottom: 10px;
+  }
+  
+  .todo-input input,
+  .todo-input textarea,
+  .todo-input select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .todo-input button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background 0.3s;
+  }
+  
+  .todo-input button:hover {
+    background-color: #45a049;
+  }
+  

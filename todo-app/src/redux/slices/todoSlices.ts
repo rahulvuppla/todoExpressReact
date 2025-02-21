@@ -7,24 +7,30 @@ export interface Todo {
   dueDate: string;
   completed: boolean;
   categoryId: number;
+  createdAt: string;
 }
 
 export interface TodoState {
   todos: Todo[];
+  filterStatus: 'all' | 'active' | 'completed';
+  sortBy: 'dueDate' | 'createdAt';
 }
 
 const initialState: TodoState = {
-  todos: []
+  todos: [],
+  filterStatus: 'all',
+  sortBy: 'createdAt'
 };
 
 const todoSlice = createSlice({
   name: 'todos',
   initialState,
   reducers: {
-    addTodo: (state, action: PayloadAction<Omit<Todo, 'id' | 'completed'>>) => {
+    addTodo: (state, action: PayloadAction<Omit<Todo, 'id' | 'completed' | 'createdAt'>>) => {
       const newTodo: Todo = {
         id: Date.now(),
         completed: false,
+        createdAt: new Date().toISOString(),
         ...action.payload
       };
       state.todos.push(newTodo);
@@ -43,9 +49,15 @@ const todoSlice = createSlice({
       if (index !== -1) {
         state.todos[index] = action.payload;
       }
+    },
+    setFilterStatus: (state, action: PayloadAction<'all' | 'active' | 'completed'>) => {
+      state.filterStatus = action.payload;
+    },
+    setSortBy: (state, action: PayloadAction<'dueDate' | 'createdAt'>) => {
+      state.sortBy = action.payload;
     }
   }
 });
 
-export const { addTodo, toggleTodo, deleteTodo, updateTodo } = todoSlice.actions;
+export const { addTodo, toggleTodo, deleteTodo, updateTodo, setFilterStatus, setSortBy } = todoSlice.actions;
 export default todoSlice.reducer;

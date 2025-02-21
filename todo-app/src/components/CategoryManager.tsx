@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addCategory } from '../redux/slices/categorySlices';
 import { RootState } from '../redux/store';
+import './CategoryManager.css';
 
 const CategoryManager: React.FC = () => {
   const [categoryName, setCategoryName] = useState('');
@@ -16,7 +17,7 @@ const CategoryManager: React.FC = () => {
   };
 
   return (
-    <div style={{ margin: '20px 0' }}>
+    <div className="category-manager">
       <h2>Manage Categories</h2>
       <input 
         type="text" 

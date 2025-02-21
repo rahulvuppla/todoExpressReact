@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import { toggleTodo, deleteTodo, updateTodo, Todo } from '../redux/slices/todoSlices';
+import { toggleTodo, deleteTodo, updateTodo, setFilterStatus, setSortBy, Todo } from '../redux/slices/todoSlices';
 
 const TodoList: React.FC = () => {
   const todos = useSelector((state: RootState) => state.todos.todos);
   const categories = useSelector((state: RootState) => state.categories.categories);
+  const filterStatus = useSelector((state: RootState) => state.todos.filterStatus);
+  const sortBy = useSelector((state: RootState) => state.todos.sortBy);
   const dispatch = useDispatch();
 
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [editText, setEditText] = useState('');
+
+  const filteredTodos = todos.filter(todo => {
+    if (filterStatus === 'active') return !todo.completed;
+    if (filterStatus === 'completed') return todo.completed;
+    return true;
+  });
+
+  const sortedTodos = [...filteredTodos].sort((a, b) => {
+    if (sortBy === 'dueDate') return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
 
   const handleToggle = (id: number) => {
     dispatch(toggleTodo(id));
@@ -35,11 +48,22 @@ const TodoList: React.FC = () => {
   return (
     <div style={{ marginTop: '20px' }}>
       <h2>Todo List</h2>
+      <div style={{ marginBottom: '10px' }}>
+        <select onChange={(e) => dispatch(setFilterStatus(e.target.value as any))}>
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+        <select onChange={(e) => dispatch(setSortBy(e.target.value as any))} style={{ marginLeft: '10px' }}>
+          <option value="createdAt">Sort by Creation Date</option>
+          <option value="dueDate">Sort by Due Date</option>
+        </select>
+      </div>
       {categories.map(category => (
         <div key={category.id} style={{ marginBottom: '20px' }}>
           <h3>{category.name}</h3>
           <ul>
-            {todos
+            {sortedTodos
               .filter(todo => todo.categoryId === category.id)
               .map(todo => (
                 <li key={todo.id}>
@@ -61,7 +85,7 @@ const TodoList: React.FC = () => {
                   ) : (
                     <>
                       <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
-                        {todo.title}
+                        {todo.title} - Due: {todo.dueDate}
                       </span>
                       <button onClick={() => handleEdit(todo)}>Edit</button>
                     </>

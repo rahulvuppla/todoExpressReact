@@ -1,0 +1,30 @@
+.category-manager {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .category-manager h2 {
+    margin-bottom: 10px;
+  }
+  
+  .category-manager input {
+    width: 70%;
+  }
+  
+  .category-manager button {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-left: 10px;
+    transition: background 0.3s;
+  }
+  
+  .category-manager button:hover {
+    background-color: #007bb5;
+  }
+  

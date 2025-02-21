@@ -8,7 +8,7 @@ import TodoList from './components/TodoList';
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <div style={{ padding: '20px' }}>
+      <div className="main-container" style={{ padding: '20px', fontFamily: 'Arial' }}>
         <h1>Todo App</h1>
         <CategoryManager />
         <TodoInput />

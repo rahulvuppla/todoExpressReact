@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { addTodo } from '../redux/slices/todoSlices';
+import './TodoInput.css';
 
 const TodoInput: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -22,7 +23,8 @@ const TodoInput: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="todo-input">
+      <h2>Add New Todo</h2>
       <input 
         type="text" 
         value={title} 
