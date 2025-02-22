@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+// src/components/TodoInput.tsx
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { RootState, AppDispatch } from '../redux/store';
 import { addTodo } from '../redux/slices/todoSlices';
+import { fetchCategories, Category } from '../redux/slices/categorySlices';
 import './TodoInput.css';
 
 const TodoInput: React.FC = () => {
@@ -10,8 +12,13 @@ const TodoInput: React.FC = () => {
   const [dueDate, setDueDate] = useState('');
   const [categoryId, setCategoryId] = useState<number>(0);
 
-  const categories = useSelector((state: RootState) => state.categories.categories);
-  const dispatch = useDispatch();
+  const categories: Category[] = useSelector((state: RootState) => state.categories.categories);
+  // Use AppDispatch here as well
+  const dispatch: AppDispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const handleAddTodo = () => {
     if (title.trim() && categoryId) {
@@ -19,6 +26,7 @@ const TodoInput: React.FC = () => {
       setTitle('');
       setDescription('');
       setDueDate('');
+      setCategoryId(0);
     }
   };
 
@@ -41,11 +49,15 @@ const TodoInput: React.FC = () => {
         value={dueDate} 
         onChange={(e) => setDueDate(e.target.value)} 
       />
-      <select onChange={(e) => setCategoryId(Number(e.target.value))}>
+      <select value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))}>
         <option value={0}>Select Category</option>
-        {categories.map(category => (
-          <option key={category.id} value={category.id}>{category.name}</option>
-        ))}
+        {categories.length > 0 ? (
+          categories.map((category: Category) => (
+            <option key={category.id} value={category.id}>{category.name}</option>
+          ))
+        ) : (
+          <option>Loading...</option>
+        )}
       </select>
       <button onClick={handleAddTodo}>Add Todo</button>
     </div>

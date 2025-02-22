@@ -1,14 +1,21 @@
-import { configureStore } from '@reduxjs/toolkit';
+// src/redux/store.ts
+import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import categoryReducer, { CategoryState } from './slices/categorySlices';
 import todoReducer from './slices/todoSlices';
-import categoryReducer from './slices/categorySlices';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    todos: todoReducer,
     categories: categoryReducer,
-  }
+    todos: todoReducer,
+  },
 });
 
+// ✅ Correctly define RootState and AppDispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export default store;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
