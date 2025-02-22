@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../redux/store';
+
 import { RootState } from '../redux/store';
-import { toggleTodo, deleteTodo, updateTodo, setFilterStatus, setSortBy, Todo } from '../redux/slices/todoSlices';
+import { toggleTodo, deleteTodo, updateTodo, setFilterStatus, setSortBy, Todo,fetchTodos} from '../redux/slices/todoSlices';
+import './TodoList.css'
 
 const TodoList: React.FC = () => {
   const todos = useSelector((state: RootState) => state.todos.todos);
   const categories = useSelector((state: RootState) => state.categories.categories);
   const filterStatus = useSelector((state: RootState) => state.todos.filterStatus);
   const sortBy = useSelector((state: RootState) => state.todos.sortBy);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+
 
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [editText, setEditText] = useState('');
+  const [editDesc,setEditDesc]=useState('')
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, [dispatch]);
 
   const filteredTodos = todos.filter(todo => {
     if (filterStatus === 'active') return !todo.completed;
@@ -35,18 +43,22 @@ const TodoList: React.FC = () => {
   const handleEdit = (todo: Todo) => {
     setEditingTodo(todo);
     setEditText(todo.title);
+    setEditDesc(todo.description);
   };
 
   const handleUpdate = () => {
     if (editingTodo && editText.trim() !== '') {
-      dispatch(updateTodo({ ...editingTodo, title: editText }));
+      dispatch(updateTodo({ ...editingTodo, title: editText ,description:editDesc}));
       setEditingTodo(null);
       setEditText('');
     }
   };
-
+  const getCategoryName = (categoryId: number) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'Uncategorized';
+  };
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div style={{ marginTop: '20px' }} className="todo-list">
       <h2>Todo List</h2>
       <div style={{ marginBottom: '10px' }}>
         <select onChange={(e) => dispatch(setFilterStatus(e.target.value as any))}>
@@ -58,44 +70,51 @@ const TodoList: React.FC = () => {
           <option value="createdAt">Sort by Creation Date</option>
           <option value="dueDate">Sort by Due Date</option>
         </select>
-      </div>
-      {categories.map(category => (
-        <div key={category.id} style={{ marginBottom: '20px' }}>
-          <h3>{category.name}</h3>
-          <ul>
-            {sortedTodos
-              .filter(todo => todo.categoryId === category.id)
-              .map(todo => (
-                <li key={todo.id}>
-                  <input 
-                    type="checkbox" 
-                    checked={todo.completed} 
-                    onChange={() => handleToggle(todo.id)} 
-                  />
-                  {editingTodo?.id === todo.id ? (
-                    <>
-                      <input 
-                        type="text" 
-                        value={editText} 
-                        onChange={(e) => setEditText(e.target.value)} 
-                      />
-                      <button onClick={handleUpdate}>Update</button>
-                      <button onClick={() => setEditingTodo(null)}>Cancel</button>
-                    </>
-                  ) : (
-                    <>
-                      <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
-                        {todo.title} - Due: {todo.dueDate}
-                      </span>
-                      <button onClick={() => handleEdit(todo)}>Edit</button>
-                    </>
-                  )}
-                  <button onClick={() => handleDelete(todo.id)}>Delete</button>
-                </li>
-              ))}
-          </ul>
-        </div>
-      ))}
+      </div><ul>
+      {sortedTodos.map(todo => (
+          <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+            <input 
+              type="checkbox" 
+              checked={todo.completed} 
+              onChange={() => handleToggle(todo.id)} 
+            />
+            {editingTodo?.id === todo.id ? (
+              <>
+                <input 
+                  type="text" 
+                  value={editText} 
+                  onChange={(e) => setEditText(e.target.value)} 
+                />
+                <input 
+                  type="text" 
+                  value={editDesc} 
+                  onChange={(e) => setEditDesc(e.target.value)} 
+                />
+
+
+                                <div className="todo-actions">
+
+                <button  className="update"  onClick={handleUpdate}>Update</button>
+                <button  className="cancel"  onClick={() => setEditingTodo(null)}>Cancel</button> </div>
+              </>
+            ) : (
+              <>
+                <span className="todo-text">
+   <span style={{ marginLeft: '8px' }}>{todo.title}</span>
+   <span style={{ marginLeft: '16px' }}>Description : {todo.description}</span>
+
+  <span style={{ marginLeft: '16px' }}>- Due: {todo.dueDate}</span>
+  <span style={{ marginLeft: '16px' }}>- Category: {getCategoryName(todo.categoryId)}</span>
+</span>
+
+                <div className="todo-actions">
+                  <button className="edit" onClick={() => handleEdit(todo)}>Edit</button>
+                  <button className="delete" onClick={() => handleDelete(todo.id)}>Delete</button>
+                </div>
+              </>
+            )}
+          </li>
+        ))}</ul>
     </div>
   );
 };

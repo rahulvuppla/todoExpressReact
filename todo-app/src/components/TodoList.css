@@ -24,7 +24,6 @@
     list-style: none;
     padding: 0;
   }
-  
   .todo-item {
     background: #fdfdfd;
     border: 1px solid #eaeaea;
@@ -84,6 +83,23 @@
   }
   
   .todo-actions button.delete:hover {
+    background-color: #d32f2f;
+  }
+  .todo-actions button.update {
+    background-color: #4c57b9;
+    color: white;
+  }
+  
+  .todo-actions button.update:hover {
+    background-color: #5a43be;
+  }
+  
+  .todo-actions button.cancel {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .todo-actions button.cancel:hover {
     background-color: #d32f2f;
   }
   

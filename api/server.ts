@@ -77,9 +77,25 @@ app.delete('/api/todos/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete todo' });
   }
 });
+// Sync Database and Seed Initial Data
+sequelize.sync({ force: true }).then(async () => {
+  console.log('Database synced');
 
-// Sync Database and Start Server
-sequelize.sync().then(() => {
+  // Seed initial category
+  const newCategory = await Category.create({ name: 'Work' });
+
+  // Seed initial todo linked to the newly created category
+  await Todo.create({ 
+    title: 'Project', 
+    description: 'Work on React,Typescript,Redux,ExpressJs Proj for Amazon Assessment', 
+    dueDate: new Date().toISOString(), 
+    completed: true, 
+    categoryId: newCategory.id, 
+    createdAt: new Date().toISOString() 
+  });
+
+  console.log('Initial data seeded');
+
   app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
   });

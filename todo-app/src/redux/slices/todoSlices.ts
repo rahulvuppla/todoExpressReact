@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 export interface Todo {
   id: number;
@@ -14,13 +15,23 @@ export interface TodoState {
   todos: Todo[];
   filterStatus: 'all' | 'active' | 'completed';
   sortBy: 'dueDate' | 'createdAt';
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: TodoState = {
   todos: [],
   filterStatus: 'all',
-  sortBy: 'createdAt'
+  sortBy: 'createdAt',
+  loading: false,
+  error: null
 };
+
+// Async thunk to fetch todos from backend
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
+  const response = await axios.get('http://localhost:5000/api/todos');
+  return response.data;
+});
 
 const todoSlice = createSlice({
   name: 'todos',
@@ -56,6 +67,21 @@ const todoSlice = createSlice({
     setSortBy: (state, action: PayloadAction<'dueDate' | 'createdAt'>) => {
       state.sortBy = action.payload;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTodos.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTodos.fulfilled, (state, action) => {
+        state.loading = false;
+        state.todos = action.payload;
+      })
+      .addCase(fetchTodos.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch todos';
+      });
   }
 });
 

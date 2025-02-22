@@ -11,7 +11,12 @@ const TodoInput: React.FC = () => {
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [categoryId, setCategoryId] = useState<number>(0);
-
+  const [inputErrors, setInputErrors] = useState({
+    title: false,
+    description: false,
+    dueDate: false,
+    categoryId: false,
+  });
   const categories: Category[] = useSelector((state: RootState) => state.categories.categories);
   // Use AppDispatch here as well
   const dispatch: AppDispatch = useDispatch();
@@ -21,6 +26,19 @@ const TodoInput: React.FC = () => {
   }, [dispatch]);
 
   const handleAddTodo = () => {
+    const errors = {
+      title: !title.trim(),
+      description: !description.trim(),
+      dueDate: !dueDate,
+      categoryId: categoryId === 0,
+    };
+  
+    setInputErrors(errors);
+  
+    if (Object.keys(errors).map(key => errors[key as keyof typeof errors]).some(error => error)) {
+      return;
+    }
+
     if (title.trim() && categoryId) {
       dispatch(addTodo({ title, description, dueDate, categoryId }));
       setTitle('');
@@ -36,20 +54,48 @@ const TodoInput: React.FC = () => {
       <input 
         type="text" 
         value={title} 
-        onChange={(e) => setTitle(e.target.value)} 
+        onChange={(e) => {
+          setTitle(e.target.value);
+          setInputErrors({ ...inputErrors, title: false });
+        }} 
         placeholder="Title" 
+        style={{
+          borderColor: inputErrors.title ? 'red' : '',
+          outline: inputErrors.title ? 'red' : ''
+        }}
       />
       <textarea 
         value={description} 
-        onChange={(e) => setDescription(e.target.value)} 
+        onChange={(e) => {
+          setDescription(e.target.value);
+          setInputErrors({ ...inputErrors, description: false });
+        }} 
         placeholder="Description"
+        style={{
+          borderColor: inputErrors.description ? 'red' : '',
+          outline: inputErrors.description ? 'red' : ''
+        }}
       />
       <input 
         type="date" 
         value={dueDate} 
-        onChange={(e) => setDueDate(e.target.value)} 
+        onChange={(e) => {
+          setDueDate(e.target.value);
+          setInputErrors({ ...inputErrors, dueDate: false });
+        }} 
+        style={{
+          borderColor: inputErrors.dueDate ? 'red' : '',
+          outline: inputErrors.dueDate ? 'red' : ''
+        }}
       />
-      <select value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))}>
+      <select value={categoryId} onChange={(e) => {
+        setCategoryId(Number(e.target.value));
+        setInputErrors({ ...inputErrors, categoryId: false });
+      }}
+      style={{
+        borderColor: inputErrors.categoryId ? 'red' : '',
+        outline: inputErrors.categoryId ? 'red' : ''
+      }}>
         <option value={0}>Select Category</option>
         {categories.length > 0 ? (
           categories.map((category: Category) => (
