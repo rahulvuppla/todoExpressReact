@@ -48,7 +48,15 @@ const TodoInput: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if(e.key === 'Enter'){
+        e.preventDefault()
+        handleAddTodo()
+      }
+    }
+
   return (
+    <form onSubmit={handleAddTodo}>
     <div className="todo-input">
       <h2>Add New Todo</h2>
       <input 
@@ -63,6 +71,7 @@ const TodoInput: React.FC = () => {
           borderColor: inputErrors.title ? 'red' : '',
           outline: inputErrors.title ? 'red' : ''
         }}
+        onKeyDown={handleKeyDown}
       />
       <textarea 
         value={description} 
@@ -75,6 +84,7 @@ const TodoInput: React.FC = () => {
           borderColor: inputErrors.description ? 'red' : '',
           outline: inputErrors.description ? 'red' : ''
         }}
+        onKeyDown={handleKeyDown}
       />
       <input 
         type="date" 
@@ -87,6 +97,7 @@ const TodoInput: React.FC = () => {
           borderColor: inputErrors.dueDate ? 'red' : '',
           outline: inputErrors.dueDate ? 'red' : ''
         }}
+        onKeyDown={handleKeyDown}
       />
       <select value={categoryId} onChange={(e) => {
         setCategoryId(Number(e.target.value));
@@ -107,6 +118,7 @@ const TodoInput: React.FC = () => {
       </select>
       <button onClick={handleAddTodo}>Add Todo</button>
     </div>
+    </form>
   );
 };
 

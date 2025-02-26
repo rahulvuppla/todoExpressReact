@@ -17,6 +17,7 @@ const TodoList: React.FC = () => {
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [editText, setEditText] = useState('');
   const [editDesc,setEditDesc]=useState('')
+  const [editCategory,setEditCategory]=useState<number | null>(null)
   useEffect(() => {
     dispatch(fetchTodos());
   }, [dispatch]);
@@ -44,19 +45,24 @@ const TodoList: React.FC = () => {
     setEditingTodo(todo);
     setEditText(todo.title);
     setEditDesc(todo.description);
+    setEditCategory(todo.categoryId);
   };
 
   const handleUpdate = () => {
     if (editingTodo && editText.trim() !== '') {
-      dispatch(updateTodo({ ...editingTodo, title: editText ,description:editDesc}));
+      dispatch(updateTodo({ ...editingTodo, title: editText ,description:editDesc, categoryId:editCategory || editingTodo.categoryId}));
       setEditingTodo(null);
       setEditText('');
+      setEditCategory(null)
     }
   };
   const getCategoryName = (categoryId: number) => {
     const category = categories.find(cat => cat.id === categoryId);
     return category ? category.name : 'Uncategorized';
   };
+
+ 
+
   return (
     <div style={{ marginTop: '20px' }} className="todo-list">
       <h2>Todo List</h2>
@@ -90,6 +96,16 @@ const TodoList: React.FC = () => {
                   value={editDesc} 
                   onChange={(e) => setEditDesc(e.target.value)} 
                 />
+                <select 
+                value={editCategory || ''}
+                onChange={(e) =>  setEditCategory(Number(e.target.value))}>
+                  <option>Select Category</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
 
 
                                 <div className="todo-actions">
